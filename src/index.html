@@ -3,14 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Weather App</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
-    <form id="weather-form">
-        <label for="city-input">Enter city to get weather</label>
-        <input type="text" name="city" id="city-input" placeholder="Enter City" required>
-        <button type="submit">Get Weather!</button>
-    </form>
-    <div id="container"></div>
+    <div class="particles"></div>
+    <div class="glass-wrapper">
+        <form id="weather-form" class="weather-form">
+            <div class="input-group">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" name="city" id="city-input" placeholder="Enter City" required>
+                <div class="input-border"></div>
+            </div>
+            <button type="submit">
+                <span>Get Weather</span>
+                <i class="fas fa-cloud-sun"></i>
+            </button>
+        </form>
+        <div id="container" class="weather-container">
+            <!-- Weather data will be inserted here -->
+        </div>
+    </div>
 </body>
 </html>

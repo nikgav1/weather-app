@@ -1,3 +1,5 @@
+import './style.css'
+
 let openWeatherUrl = `https://api.openweathermap.org/data/2.5/weather?q=&appid=02f48485583adfe6c9f0547954991b91&units=metric`;
 
 const container = document.getElementById("container");
@@ -19,8 +21,40 @@ function weatherConditionFactory(
 }
 
 async function getWeatherData(url) {
-  const response = await fetch(url, { mode: "cors" });
-  const data = await response.json();
+  try {
+    const response = await fetch(url, { mode: "cors" });
+    if (!response.ok) {
+      if (response.status === 404) {
+        console.warn("City not found (404).");
+      } else {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+      return null;
+    }
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error fetching weather data:", error);
+    return null;
+  }
+}
+
+async function getAppropriateData(city) {
+  openWeatherUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=02f48485583adfe6c9f0547954991b91&units=metric`;
+  const dataRaw = await getWeatherData(openWeatherUrl);
+
+  if (!dataRaw || !dataRaw.main) {
+    console.warn("Invalid data received from API");
+    return null;
+  }
+
+  const data = weatherConditionFactory(
+    dataRaw.main.temp,
+    dataRaw.main.feels_like,
+    dataRaw.main.humidity,
+    dataRaw.wind.speed,
+    dataRaw.main.pressure
+  );
   return data;
 }
 
@@ -28,6 +62,15 @@ async function putDataIntoContainer(city) {
   const data = await getAppropriateData(city);
 
   container.innerHTML = "";
+
+  if (!data) {
+    container.innerHTML =
+      "<p>Error fetching weather data. Please try again.</p>";
+    return;
+  }
+  const cityName = document.createElement("h2");
+  cityName.textContent = city;
+  container.appendChild(cityName);
 
   const tempElement = document.createElement("p");
   tempElement.textContent = `Temperature: ${data.temp}°C`;
@@ -48,19 +91,6 @@ async function putDataIntoContainer(city) {
   const pressureElement = document.createElement("p");
   pressureElement.textContent = `Pressure: ${data.pressure} hPa`;
   container.appendChild(pressureElement);
-}
-
-async function getAppropriateData(city) {
-  openWeatherUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=02f48485583adfe6c9f0547954991b91&units=metric`;
-  const dataRaw = await getWeatherData(openWeatherUrl);
-  const data = weatherConditionFactory(
-    dataRaw.main.temp,
-    dataRaw.main.feels_like,
-    dataRaw.main.humidity,
-    dataRaw.wind.speed,
-    dataRaw.main.pressure
-  );
-  return data;
 }
 
 function handleForm(e) {
